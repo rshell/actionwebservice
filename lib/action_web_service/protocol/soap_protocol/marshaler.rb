@@ -42,6 +42,8 @@ module ActionWebService
           soap = SOAP::Mapping.obj2soap(obj, @registry)
           soap.elename = XSD::QName.new if SOAP::Version >= "1.5.5" && soap.elename == XSD::QName::EMPTY
           soap
+		rescue Exception => ex
+		  raise "SOAP Object convertion failed #{ex.message } #{obj.class} \n #{obj.to_yaml}"
         end
 
         def register_type(type)

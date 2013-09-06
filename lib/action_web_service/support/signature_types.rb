@@ -22,7 +22,7 @@ module ActionWebService # :nodoc:
       signature.map{ |spec| canonical_signature_entry(spec, i += 1) }
     end
 
-    def canonical_signature_entry(spec, i) # :nodoc:
+    def canonical_signature_entry(spec, i,nillible=true,default=nil) # :nodoc:
       orig_spec = spec
       name = "param#{i}"
       if spec.is_a?(Hash)
@@ -34,9 +34,9 @@ module ActionWebService # :nodoc:
       else
         type = canonical_type(type)
         if type.is_a?(Symbol)
-          BaseType.new(orig_spec, type, name)
+          BaseType.new(orig_spec, type, name,nillible,default)
         else
-          StructuredType.new(orig_spec, type, name)
+          StructuredType.new(orig_spec, type, name,nillible,default)
         end
       end
     end
@@ -94,8 +94,7 @@ module ActionWebService # :nodoc:
         :base64
       elsif klass == TrueClass || klass == FalseClass
         :bool
-#      elsif derived_from?(Float, klass) || derived_from?(Precision, klass) || derived_from?(Numeric, klass)
-      elsif derived_from?(Float, klass) || derived_from?(Numeric, klass)
+      elsif derived_from?(Float, klass) || derived_from?(BigDecimal, klass) || derived_from?(Numeric, klass)
         :float
       elsif klass == Time
         :time
@@ -155,12 +154,16 @@ module ActionWebService # :nodoc:
     attr :type
     attr :type_class
     attr :name
-
-    def initialize(spec, type, name)
+    attr :nillable
+    attr :default
+    
+    def initialize(spec, type, name,nillable=false,default=nil)
       @spec = spec
       @type = canonical_type(type)
       @type_class = canonical_type_class(@type)
       @name = name
+      @nillable = nillable
+      @default = default
     end
 
     def custom?
@@ -186,7 +189,7 @@ module ActionWebService # :nodoc:
     attr :element_type
 
     def initialize(spec, element_type, name)
-      super(spec, Array, name)
+      super(spec, Array, name,false,nil)
       @element_type = element_type
     end
 
@@ -208,7 +211,7 @@ module ActionWebService # :nodoc:
       elsif @type_class.respond_to?(:columns)
         i = -1
         @type_class.columns.each do |column|
-          yield column.name, canonical_signature_entry(column.type, i += 1)
+          yield column.name, canonical_signature_entry(column.type, i += 1, column.null, column.default)
         end
       end
     end

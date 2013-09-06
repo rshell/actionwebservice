@@ -27,6 +27,7 @@ module ActionWebService # :nodoc:
         end
       
         def web_service_direct_invoke(invocation)
+          Rails.logger.debug("Web Service direct_invoke [#{invocation.api_method}]")
           @method_params = invocation.method_ordered_params
           arity = method(invocation.api_method.name).arity rescue 0
           if arity < 0 || arity > 0
@@ -38,6 +39,7 @@ module ActionWebService # :nodoc:
         end
 
         def web_service_delegated_invoke(invocation)
+          Rails.logger.debug("Web Service delegated_invoke [#{invocation.api_method}]")
           web_service_filtered_invoke(invocation, invocation.method_ordered_params)
         end
 
@@ -59,6 +61,7 @@ module ActionWebService # :nodoc:
           when :delegated, :layered
             return_value = web_service_delegated_invoke(invocation)
           end
+
           web_service_create_response(invocation.protocol, invocation.protocol_options, invocation.api, invocation.api_method, return_value)
         end
         
@@ -183,6 +186,7 @@ module ActionWebService # :nodoc:
         end
 
         def web_service_create_response(protocol, protocol_options, api, api_method, return_value)
+          Rails.logger.debug("Web Service create_response [#{api_method}]")
           if api.has_api_method?(api_method.name)
             return_type = api_method.returns ? api_method.returns[0] : nil
             return_value = api_method.cast_returns(return_value)

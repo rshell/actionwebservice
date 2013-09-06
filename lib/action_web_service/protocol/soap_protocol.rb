@@ -105,7 +105,7 @@ module ActionWebService # :nodoc:
             if return_value.is_a?(Exception)
               detail = SOAP::Mapping::SOAPException.new(return_value)
               response = SOAP::SOAPFault.new(
-                SOAP::SOAPQName.new('%s:%s' % [SOAP::SOAPNamespaceTag, 'Server']),
+                SOAP::SOAPQName.new('%s:%s' % ['env', 'Server']),
                 SOAP::SOAPString.new(return_value.to_s),
                 SOAP::SOAPString.new(self.class.name),
                 marshaler.ruby_to_soap(detail))

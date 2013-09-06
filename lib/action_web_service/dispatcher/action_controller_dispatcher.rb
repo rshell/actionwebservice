@@ -57,6 +57,7 @@ module ActionWebService # :nodoc:
                 begin
                   ws_response = invoke_web_service_request(ws_request)
                 rescue Exception => e
+                  Rails.logger.error(e)
                   exception = e
                 end
               end

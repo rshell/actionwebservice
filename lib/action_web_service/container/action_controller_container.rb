@@ -81,8 +81,13 @@ module ActionWebService # :nodoc:
 
         private
           def inherited_with_api(child)
-            inherited_without_api(child)
-            begin child.web_service_api(child.controller_path)
+            begin
+             inherited_without_api(child)
+            rescue Exception => ex
+              puts "\nWeb service API #{ex.class.to_s}\n   #{ex.message}\n"
+            end
+            begin
+               child.web_service_api(child.controller_path)
             rescue MissingSourceFile => e
               raise unless e.is_missing?("apis/#{child.controller_path}_api")
             end

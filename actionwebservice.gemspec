@@ -1,22 +1,37 @@
+# -*- encoding: utf-8 -*-
+
 Gem::Specification.new do |s|
-  s.platform = Gem::Platform::RUBY
-  s.name = 'actionwebservice'
-  s.summary = "Web service support for Action Pack."
-  s.description = %q{Adds WSDL/SOAP and XML-RPC web service support to Action Pack}
-  s.version = '3.0.4'
+  s.name = "actionwebservice"
+  s.version = "3.0.4"
 
-  s.author = "Leon Breedt, Kent Sibilev"
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.authors = ["Leon Breedt, Kent Sibilev"]
+  s.date = "2013-08-15"
+  s.description = "Adds WSDL/SOAP and XML-RPC web service support to Action Pack"
   s.email = "bitserf@gmail.com, ksibilev@yahoo.com"
-  s.rubyforge_project = "aws"
+  s.files = ["Rakefile", "setup.rb", "README", "TODO", "CHANGELOG", "MIT-LICENSE"]
   s.homepage = "http://www.rubyonrails.org"
+  s.require_paths = ["lib"]
+  s.requirements = ["none"]
+  s.rubyforge_project = "aws"
+  s.rubygems_version = "1.8.25"
+  s.summary = "Web service support for Action Pack."
 
-  s.add_dependency('actionpack', '>= 3.0.5')
-  s.add_dependency('activerecord', '>= 3.0.5')
-  s.add_dependency('activesupport', '>= 3.0.5')
-  
-  s.has_rdoc = true
-  s.requirements << 'none'
-  s.require_path = 'lib'
+  if s.respond_to? :specification_version then
+    s.specification_version = 3
 
-  s.files = [ "Rakefile", "setup.rb", "README", "TODO", "CHANGELOG", "MIT-LICENSE" ]
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<actionpack>, [">= 3.0.5"])
+      s.add_runtime_dependency(%q<activerecord>, [">= 3.0.5"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 3.0.5"])
+    else
+      s.add_dependency(%q<actionpack>, [">= 3.0.5"])
+      s.add_dependency(%q<activerecord>, [">= 3.0.5"])
+      s.add_dependency(%q<activesupport>, [">= 3.0.5"])
+    end
+  else
+    s.add_dependency(%q<actionpack>, [">= 3.0.5"])
+    s.add_dependency(%q<activerecord>, [">= 3.0.5"])
+    s.add_dependency(%q<activesupport>, [">= 3.0.5"])
+  end
 end

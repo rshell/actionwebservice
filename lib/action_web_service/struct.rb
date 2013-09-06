@@ -19,6 +19,7 @@ module ActionWebService
   # Active Record model classes are already implicitly supported in method
   # signatures.
   class Struct
+    
     # If a Hash is given as argument to an ActionWebService::Struct constructor,
     # it can contain initial values for the structure member.
     def initialize(values={})
@@ -38,19 +39,71 @@ module ActionWebService
         yield name, self.__send__(name)
       end
     end
+    
 
+    def to_hash
+      set = {}
+      self.class.members.each do |name,value|
+        set[name]=value
+      end
+      set
+    end
+
+    def to_rec(rec)
+      self.class.members.each do |name,type|
+         begin
+           rec.send("#{name}=",self.send(name))  
+         rescue
+           puts "failed to read attribute #{name}" 
+         end        
+      end
+      rec
+    end
+
+    def from_rec(rec)
+      self.class.members.each do |name,type|
+           begin
+             self.send("#{name}=",rec.send(name))  
+           rescue
+             ActiveRecord::Base.logger.warn "failed to read attribute #{name}" 
+           end        
+        end
+        self
+    end
+        
     class << self
       # Creates a structure member with the specified +name+ and +type+. Generates
       # accessor methods for reading and writing the member value.
-      def member(name, type)
+      def member(name, type,nillable=false,default=nil)
         name = name.to_sym
-        type = ActionWebService::SignatureTypes.canonical_signature_entry({ name => type }, 0)
+        type = ActionWebService::SignatureTypes.canonical_signature_entry({ name => type }, 0,nillable,default)
         write_inheritable_hash("struct_members", name => type)
         class_eval <<-END
           def #{name}; @#{name}; end
           def #{name}=(value); @#{name} = value; end
         END
       end
+      
+        def from_rec(rec)
+          item = self.new
+          self.members.each do |name,type|
+               begin
+                 item.send("#{name}=",rec.send(name))  
+               rescue
+                 ActiveRecord::Base.logger.warn "failed to read attribute #{name}" 
+               end        
+            end
+          item
+        end
+      #
+      # Convert a list of items into a list of struct
+      #  
+      def from_list(list)
+        list.collect do | rec|
+           from_rec(rec)          
+        end
+      end
+            
   
       def members # :nodoc:
         read_inheritable_attribute("struct_members") || {}
